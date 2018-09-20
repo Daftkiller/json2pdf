@@ -32,21 +32,16 @@ export class Json2PdfComponent implements OnInit {
     //   console.log(error);
     // });
   }
-// Read File function
-fileChanged(e) {
-    this.disableButton = false;
-    this.file = e.target.files[0];
-    console.log(this.file);
-    this.uploadDocument(this.file);
-}
 // Read File Convert it into String And String is convert it object
 uploadDocument(file) {
+  this.alertsShow = false ;
+  this.disableButton = false;
   const fileReader = new FileReader();
   fileReader.onload = (e) => {
     this.jsonData = JSON.parse(fileReader.result);
     console.log(fileReader.result);
   }
-  fileReader.readAsText(this.file);
+  fileReader.readAsText(file.target.files[0]);
 }
 
 // Convert Object into String
@@ -65,14 +60,14 @@ uploadDocument(file) {
     const col = ['Keys', 'values'];
     const rows = [];
     let temp: any;
-    if (this.jsonData.data.length !==0 ) {
+    if (this.jsonData.data.length !== 0 ) {
       console.log('check1');
         for (let i = 0; i <= this.jsonData.data.length - 1; i++) {
           for (const key in this.jsonData.data[i]) {
-            if (this.jsonData.data[i].hasOwnProperty(key)){
+            if (this.jsonData.data[i].hasOwnProperty(key)) {
               // console.log('Type of variable');
               // console.log(typeof this.jsonData.data[i][key]);
-            if (typeof this.jsonData.data[i][key] === 'object'){
+            if (typeof this.jsonData.data[i][key] === 'object') {
               // console.log('check');
               temp =[key, this.getString(this.jsonData.data[i][key])];
               rows.push(temp);
@@ -87,7 +82,7 @@ uploadDocument(file) {
         startY: 20,
         styles: {overflow: 'linebreak', columnWidth: 'wrap'},
         columnStyles: {
-          1: {columnWidth: ''},
+          1: {columnWidth: 'auto'},
           2: {columnWidth: 'wrap'}}
       });
       // Save the PDF

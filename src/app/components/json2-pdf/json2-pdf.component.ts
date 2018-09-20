@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http'
 import { HttpErrorResponse } from '@angular/common/http';
 import { PrettyPrintPipe } from '../../pretty-print.pipe';
+import {MatSnackBar} from '@angular/material';
+
 // import * as jsPDF from 'jspdf';
 declare let jsPDF: any;
 
@@ -12,10 +14,20 @@ declare let jsPDF: any;
 })
 export class Json2PdfComponent implements OnInit {
   constructor(private httpService: HttpClient,
-              private prettyPrintPipe: PrettyPrintPipe) {}
+              private prettyPrintPipe: PrettyPrintPipe,
+              public matSnackBar: MatSnackBar) {}
   jsonData: any = [];
   file: any;
-
+  dismissible = true;
+  disableButton = true;
+  alertsShow = false;
+  defaultAlerts: any = 
+    {
+      type: 'danger',
+      msg: `No Data is avaiable in json file`
+    }
+  ;
+  alerts = this.defaultAlerts;
   ngOnInit() {
     // this.httpService.get('src/assets/test.json').subscribe((data: any) => {
     //   this.jsonData = data as any[];
@@ -26,6 +38,7 @@ export class Json2PdfComponent implements OnInit {
   }
 // Read File function
 fileChanged(e) {
+    this.disableButton = false;
     this.file = e.target.files[0];
     console.log(this.file);
     this.uploadDocument(this.file);
@@ -49,36 +62,46 @@ uploadDocument(file) {
   }
  // Create PDF Fuction
   downloadPdf() {
+    console.log('check');
     console.log(this.jsonData);
     // this.jsonData = JSON.parse(this.jsonData);
     const doc = new jsPDF();
     const col = ['Keys', 'values'];
     const rows = [];
     let temp: any;
-    for (const key in this.jsonData.data[0]) {
-      if (this.jsonData.data[0].hasOwnProperty(key)){
-        // console.log('Type of variable');
-        // console.log(typeof this.jsonData.data[0][key]);
-      if (typeof this.jsonData.data[0][key] === 'object'){
-        // console.log('check');
-        temp =[key, this.getString(this.jsonData.data[0][key])];
-        rows.push(temp);
-      } else {
-        temp = [key, this.jsonData.data[0][key]];
-        rows.push(temp);
+    if (this.jsonData.data.length !==0 ) {
+      console.log('check1');
+        for (let i = 0; i <= this.jsonData.data.length - 1; i++) {
+          for (const key in this.jsonData.data[i]) {
+            if (this.jsonData.data[i].hasOwnProperty(key)){
+              // console.log('Type of variable');
+              // console.log(typeof this.jsonData.data[i][key]);
+            if (typeof this.jsonData.data[i][key] === 'object'){
+              // console.log('check');
+              temp =[key, this.getString(this.jsonData.data[i][key])];
+              rows.push(temp);
+            } else {
+                temp = [key, this.jsonData.data[i][key]];
+                rows.push(temp);
+              }
+        // console.log(key);
+            }
+        }
       }
-      // console.log(key);
-     }
+      doc.autoTable(col, rows, {
+        startY: 20,
+        styles: {overflow: 'linebreak', columnWidth: 'wrap'},
+        columnStyles: {
+          1: {columnWidth: ''},
+          2: {columnWidth: 'wrap'}}
+      });
+      // Save the PDF
+      doc.save('Test.pdf');
+  } else {
+    this.alertsShow = true ;
     }
-    doc.autoTable(col, rows, {
-      startY: 20,
-      styles: {overflow: 'linebreak', columnWidth: 'wrap'},
-      columnStyles: {
-        1: {columnWidth: ''},
-        2: {columnWidth: 'wrap'}}
-    });
-    // Save the PDF
-    doc.save('Test.pdf');
-    }
-
+  }
+  onClosed(): void {
+    this.alertsShow = false ;
+  }
 }

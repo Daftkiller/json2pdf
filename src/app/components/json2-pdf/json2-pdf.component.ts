@@ -2,9 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http'
 import { HttpErrorResponse } from '@angular/common/http';
 import { PrettyPrintPipe } from '../../pretty-print.pipe';
-import {MatSnackBar} from '@angular/material';
-
-// import * as jsPDF from 'jspdf';
 declare let jsPDF: any;
 
 @Component({
@@ -14,14 +11,13 @@ declare let jsPDF: any;
 })
 export class Json2PdfComponent implements OnInit {
   constructor(private httpService: HttpClient,
-              private prettyPrintPipe: PrettyPrintPipe,
-              public matSnackBar: MatSnackBar) {}
+              private prettyPrintPipe: PrettyPrintPipe) {}
   jsonData: any = [];
   file: any;
   dismissible = true;
   disableButton = true;
   alertsShow = false;
-  defaultAlerts: any = 
+  defaultAlerts: any =
     {
       type: 'danger',
       msg: `No Data is avaiable in json file`
@@ -84,7 +80,6 @@ uploadDocument(file) {
                 temp = [key, this.jsonData.data[i][key]];
                 rows.push(temp);
               }
-        // console.log(key);
             }
         }
       }
